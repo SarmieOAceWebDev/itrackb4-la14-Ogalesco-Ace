@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Subjects')
@@ -27,6 +26,18 @@
         <a href="{{ route('subjects.index') }}">Clear</a>
     </form>
 
+    @can('create', App\Models\Subject::class)
+        <div class="mb-3">
+            <a href="{{ route('subjects.create') }}" class="btn btn-primary">
+                Add Subject
+            </a>
+        </div>
+    @endcan
+
+    @cannot('create', App\Models\Subject::class)
+        <p class="text-muted small">You are viewing this list in read-only mode.</p>
+    @endcannot
+
     <div class="card">
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
@@ -38,10 +49,9 @@
                         <th class="text-center">Units</th>
                         <th>Category</th>
 
-                        {{-- SS 14 - Hide Actions heading for guests --}}
-                        @auth
+                        @can('create', App\Models\Subject::class)
                             <th class="text-center">Actions</th>
-                        @endauth
+                        @endcan
                     </tr>
                 </thead>
 
@@ -58,31 +68,34 @@
                                 </span>
                             </td>
 
-                            {{-- SS 14 - Hide Edit and Delete for guests --}}
-                            @auth
+                            @can('create', App\Models\Subject::class)
                                 <td class="text-center">
-                                    <a href="{{ route('subjects.edit', $subject->id) }}"
-                                       class="btn btn-warning btn-sm">
-                                        Edit
-                                    </a>
+                                    @can('update', $subject)
+                                        <a href="{{ route('subjects.edit', $subject->id) }}"
+                                           class="btn btn-warning btn-sm">
+                                            Edit
+                                        </a>
+                                    @endcan
 
-                                    <form action="{{ route('subjects.destroy', $subject->id) }}"
-                                          method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
+                                    @can('delete', $subject)
+                                        <form action="{{ route('subjects.destroy', $subject->id) }}"
+                                              method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
 
-                                        <button type="submit"
-                                                class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Do you want to delete this subject?')">
-                                            Delete
-                                        </button>
-                                    </form>
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Do you want to delete this subject?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </td>
-                            @endauth
+                            @endcan
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->check() ? 6 : 5 }}" class="text-center text-muted py-5">
+                            <td colspan="6" class="text-center text-muted py-5">
                                 No subjects found.
                             </td>
                         </tr>

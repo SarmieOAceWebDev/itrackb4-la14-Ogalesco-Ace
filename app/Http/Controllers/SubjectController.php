@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Subject;
 use App\Models\Category;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 
 
 
@@ -41,16 +42,18 @@ public function index(Request $request)
     // ADDED: Create Subject
     public function create()
     {
-        $categories = Category::all();
+     Gate::authorize('create', Subject::class);
 
-        return view('subjects.create', compact('categories'));
+    $categories = Category::all();
+
+    return view('subjects.create', compact('categories'));
     }
 
 
     public function store(Request $request)
     {
             
-
+      Gate::authorize('create', Subject::class);
 
         $validated = $request->validate([
             'code' => 'required|string|max:10',
@@ -71,13 +74,14 @@ public function index(Request $request)
     
     public function edit(Subject $subject)
     {
-
+        Gate::authorize('update', $subject);
         $categories = Category::all();
         return view('subjects.edit', compact('subject', 'categories'));
     }
 
     public function update(Request $request, Subject $subject)
     {
+         Gate::authorize('update', $subject);
         $validated = $request->validate([
             'code' => 'required|string|max:10',
             'subject' => 'required|string|max:25',
@@ -92,7 +96,8 @@ public function index(Request $request)
 
     public function destroy(Subject $subject)
     {
-
+        
+        Gate::authorize('delete', $subject);
     abort_if($subject->category()->count() === 1    , 403);
     $subject->delete();
     return redirect()->route('subjects.index')->with('success', 'Subject has been deleted successfully.');

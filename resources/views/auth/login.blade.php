@@ -25,10 +25,11 @@
                     @error('password')
                             <div class="text-danger">{{ $message }}</div>
                     @enderror
-                    
+
                 </div>
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Log in</button>
+                    
                 </div>
             </form>
         </div></div>
