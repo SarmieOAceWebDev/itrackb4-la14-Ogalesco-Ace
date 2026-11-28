@@ -136,3 +136,20 @@ f5. well, Hiding the Add, Edit, and Delete buttons only prevents the  guests fro
 
 f6.well the Laravel's auth middleware looks for a route named login when an unauthenticated visitor tries to access a protected page. if I rename it to signin, Laravel cannot find the expected route and displays a Route login not defined error.
 
+
+
+
+LA15
+(answers)
+1. last week my project answered "Who are you?" through register and login (authentication). This week it answers "What are you allowed to do?" through app/Policies/SubjectPolicy.php (authorization). The first question is still answered by my login code in AuthController.php and the auth middleware in routes/web.php.
+
+2. the $fillable only guards mass assignment, meaning that the request data passed to create()or update(). In Tinker I set $u->role = 'admin' and called  the save() directly, so $fillable didn't apply. Keeping role out means that nobody can make themselves admin through my register form.
+
+3. A signed in normal user passes the auth middleware, but Gate::authorize('create', Subject::class) in SubjectController makes SubjectPolicy refuse them, so they get a 403. A guest is stopped earlier by the auth middleware and sent to the login page. They differ on purpose: a guest needs to log in, while a 403 tells a signed-in user that logging in wont help.
+
+4. it was a decision. viewAny() and view() in SubjectPolicy return true, and index() and show() have no Gate::authorize(). Anyone can browse subjects, but only an admin can add, edit, or delete.
+
+5. my  controller (Gate::authorize) and my subjects/index.blade.php (@can) both read the same rule from SubjectPolicy. If I wrote the role check by hand in both, I could change one and forget the other, and the button and the route would disagree. it makes One policy keeps them consistent.
+
+6. well, it counts minutes of inactivity, not time since the login, and every request resets the clock. There was no warning because the server expires the session without telling the browser. I only found out when I clicked a link and landed on the login page.
+
